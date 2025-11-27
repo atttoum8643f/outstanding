@@ -1,0 +1,260 @@
+---
+output: pdf_document
+fontsize: 12pt
+mainfont: "Times New Roman"
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage[table]{xcolor}
+  - \usepackage{graphicx}
+  - \usepackage{lscape}
+  - \usepackage{booktabs}
+  - \usepackage{tikz}
+  - \usepackage{amsmath}
+  - \usepackage{tcolorbox}
+  - \usepackage{minted}
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \setlength{\headheight}{15.35403pt}
+  - \addtolength{\topmargin}{-2.5pt}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{\textcolor{purple}{M2 SSD}}
+  - \fancyhead[C]{\textcolor{purple}{Atelier Projet \textbf{-} HAX916X}}
+  - \fancyhead[R]{\textcolor{purple}{2025 \textbf{-} 2026}}
+  - \fancyfoot[C]{\thepage}
+  - \renewcommand{\contentsname}{Table des matières}
+---
+
+\definecolor{navy}{RGB}{11, 11, 69}
+\definecolor{picker}{rgb}{255, 128, 0}
+
+\begin{titlepage}
+
+\begin{center}
+
+% Logo en haut
+\includegraphics[width=0.3\linewidth]{vis/logo_m.jpg}\\[1.5cm]
+
+% Université et département
+{\Large \textsc{Université de Montpellier}}\\[0.2cm]
+{\large \textcolor{red}{Département de Mathématiques Appliquées}}\\[1.5cm]
+
+% Encadré du titre
+\tcbset{colback=picker!15, colframe=navy, width=\textwidth, arc=3mm, boxrule=0.8mm}
+\begin{tcolorbox}
+    \centering
+    {\huge \bfseries Outstanding 2 : Modèle mixte}\\[0.3cm]
+    {\large \textit{Atelier Projet — HAX916X}}
+\end{tcolorbox}
+
+\vfill
+
+% Auteur
+\begin{flushright}
+    \textbf{Réalisé par :}\\
+    ATTOUMANI Ibrahim \\
+    DIALLO Ousmane
+\end{flushright}
+
+\vfill
+
+% Bas de page
+% Bas de page
+
+\vfill
+\noindent
+\begin{minipage}{0.38\textwidth}
+    \includegraphics[width=\linewidth]{vis/ssd.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.40\textwidth}
+    \includegraphics[width=\linewidth]{vis/agro.jpg}
+\end{minipage}
+
+\vspace{0.5cm}
+{\Large Année Universitaire 2025 -- 2026}
+
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}
+
+\newpage
+\thispagestyle{empty}
+\begingroup
+\color{black}
+\tableofcontents
+\endgroup
+\newpage
+
+
+# \textcolor{red}{1. Introduction}
+
+Dans ce cours, nous introduirons la notion d'effets aléatoires, mais, avant de définir formellement le modèle mixte, il est essentiel de comprendre 
+le contexte et les situations dans lesquelles les effets aléatoires apparaissent.
+
+Nous analysons la relation entre les notes des étudiants et les heures d'étude, en tenant compte de l'effet de la classe.
+
+On note:
+\begin{itemize}
+  \item \texttt{N}: Note
+  \item \texttt{H}: Heures d'étude
+  \item \texttt{C}: Classes (\texttt{Effet aléatoire})
+\end{itemize}
+
+Le modèle s'écrit de la façon suivante:
+
+$$
+N \sim H + C  \quad (i)
+$$
+
+Ici, les heures d'étude ($H$) ne sont pas significatives, puisque les notes des étudiants dépendent principalement de la classe, pas des heures d'étude. Ainsi, le modèle $(ii)$ ci-dessous:
+
+$$
+N \sim  C  \quad (ii)
+$$
+
+est aussi performant que le modèle $(i)$.
+
+
+À présent, nous allons modéliser les notes, la classe en fonction des heures d'études:
+
+
+$$
+H \sim N +  C  \quad (iii)
+$$
+
+Les notes sont significatives, étant donné que les heures d'étude des étudiants sont influencées par les notes.
+
+Le modèle où l'on considère seulement l'effet de la classe:
+
+$$
+H \sim  C  \quad (iv)
+$$
+
+est moins performant que le modèle $(iii)$ car les notes améliorent la prédiction des heures d'étude.
+
+En guise de conclusion, les notes influencent les heures d'étude, mais les heures d'étude n'ont pas un impact significatif sur les notes. Les modèles mixtes révèlent ces dynamiques en tenant compte des variations entre les classes.
+
+\newpage
+# \textcolor{red}{2. Modèle mixte}
+
+Un \textbf{modèle mixte} est un modèle statistique combinant à la fois des facteurs à \textbf{effets fixes} (comme dans une \textbf{ANOVA}) et des facteurs à \textbf{effets aléatoires}.
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!55!pink,title=Définition 1 : modèle mixte à un facteur]
+
+Considérons l’effet d’un facteur $A$ sur une variable $Y$, en supposant que les niveaux de $A$ sont aléatoires.  
+On note $i = 1, \dots, n$ les niveaux de $A$ et $k = 1, \dots, n_i$ les répétitions.
+
+Le modèle s’écrit alors :
+
+$$
+Y_{ik} = \mu + \alpha_i + \epsilon_{ik}
+$$
+
+avec :
+
+\begin{itemize}
+    \item $\mu$ : moyenne générale
+    \item $\alpha_i \sim \mathcal{N}(0, \sigma_\alpha^2)$ : effet aléatoire du $i$-ème niveau du facteur $A$
+    \item $\epsilon_{ik} \sim \mathcal{N}(0, \sigma^2)$ : erreur résiduelle indépendante
+    \item $\alpha_i$ et $\epsilon_{ik}$ sont indépendants
+\end{itemize}
+
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!55!pink,title=Définition 2 : modèle mixte à deux facteurs]
+
+Si l’on considère deux facteurs $A$ et $B$, tous deux aléatoires, le modèle mixte s’écrit :
+
+$$
+Y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \epsilon_{ijk}
+$$
+
+où :
+
+\begin{itemize}
+    \item $\alpha_i \sim \mathcal{N}(0, \sigma_\alpha^2)$ : effet aléatoire du facteur $A$
+    \item $\beta_j \sim \mathcal{N}(0, \sigma_\beta^2)$ : effet aléatoire du facteur $B$
+    \item $(\alpha\beta)_{ij} \sim \mathcal{N}(0, \sigma_{\alpha\beta}^2)$ : interaction aléatoire
+    \item $\epsilon_{ijk} \sim \mathcal{N}(0, \sigma^2)$ : erreur résiduelle
+    \item Tous les effets aléatoires et $\epsilon_{ijk}$ sont indépendants
+\end{itemize}
+
+\end{tcolorbox}
+
+## \textcolor{blue}{2.1. Application directe : modèle mixte}
+
+Ici, nous allons illustrer l'utilisation d'un **modèle mixte** à partir du jeu de données **sleepstudy** du package lme4.  
+
+Ces données contiennent des mesures de **temps de réaction** de sujets sur plusieurs jours de privation de sommeil, avec :  
+
+ - **Reaction** : temps de réaction en millisecondes  
+ - **Days** : nombre de jours de privation de sommeil  
+ - **Subject** : identifiant du sujet (facteur aléatoire)
+
+
+
+```{r, warning=FALSE, include=FALSE}
+# Vérifie si lme4 est installe
+if (!require(lme4)) {
+  install.packages("lme4")
+  library(lme4)
+} else {
+  library(lme4)
+}
+
+```
+
+
+
+```{r}
+# chargement des donnees
+data(sleepstudy)
+
+# Ajuster un modele mixte
+mod <- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+summary(mod)
+```
+
+La sortie du modèle mixte ajusté avec la fonction \texttt{lmer} de R fournit une analyse détaillée des effets fixes et aléatoires dans les données \texttt{sleepstudy}. Ce modèle permet d'expliquer la variabilité de la réaction (\texttt{Reaction}) selon le nombre de jours (\texttt{Days}), en prenant en compte l'effet aléatoire des sujets (\texttt{Subject}).  
+
+Le modèle s'écrit :
+
+$$
+\text{Reaction}_{ij} = \beta_0 + \beta_1 \cdot \text{Days}_{ij} + \text{Subject}_{0i} + \epsilon_{ij}
+$$
+
+avec :
+
+\begin{itemize}
+    \item $\beta_0 = 251.41$ : intercept moyen (réaction au jour 0)
+    \item $\beta_1 = 10.47$ : hausse moyenne du temps de réaction par jour de privation
+    \item $\text{Subject}_{0i} \sim \mathcal{N}(0, 1378.2)$ : effet aléatoire spécifique au sujet (intercept)
+    \item $\epsilon_{ij} \sim \mathcal{N}(0, 960.5)$ : résidu
+\end{itemize}
+
+
+Chaque jour de privation de sommeil augmente le temps de réaction en moyenne de $10.47$ unités ($Pr(>|t|) < 0.001$), en tenant compte d'une variation importante entre individus ($\sigma_\text{sujet} = 37.12$). La variation résiduelle intra-individuelle est de $\sigma = 30.99$.
+
+
+\begin{tcolorbox}[colback=green!10,colframe=navy!65!pink,title=Remarque : Calcul de la p-value à partir de la t-value]
+On peut calculer la p-value à partir de la t-value en utilisant la fonction de répartition cumulative de la distribution de Student:
+
+$$
+\mathbb{P}(T_{df} \leq t) = \int_{-\infty}^t f(x) dx \quad \text{(où f est la densité d'une Student à df degrés de libertés).}
+$$
+
+On peut le calculer sous R de la façon suivante:
+
+$$
+2*pt(-abs(t), df)
+$$
+
+où:
+
+  - $t$ est la t-value 
+  - $df$ est le degré de liberté $(n-k)$, avec $n$ le nombre d'individus et $k$ le nombre paramètres éstimés   
+
+\end{tcolorbox}

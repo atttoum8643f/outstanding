@@ -1,0 +1,326 @@
+---
+output: pdf_document
+fontsize: 12pt
+mainfont: "Times New Roman"
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage[table]{xcolor}
+  - \usepackage{graphicx}
+  - \usepackage{lscape}
+  - \usepackage{booktabs}
+  - \usepackage{tikz}
+  - \usepackage{amsmath}
+  - \usepackage{tcolorbox}
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \setlength{\headheight}{15.35403pt}
+  - \addtolength{\topmargin}{-2.5pt}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{\textcolor{purple}{M2 SSD}}
+  - \fancyhead[C]{\textcolor{purple}{Atelier Projet \textbf{-} HAX916X}}
+  - \fancyhead[R]{\textcolor{purple}{2025 \textbf{-} 2026}}
+  - \fancyfoot[C]{\thepage}
+  - \renewcommand{\contentsname}{Table des matières}
+---
+
+\begin{titlepage}
+\definecolor{umcolor}{RGB}{85, 37, 130}
+
+\begin{center}
+
+% Logo en haut
+\includegraphics[width=0.3\linewidth]{vis/logo_m.jpg}\\[1.5cm]
+
+% Université et département
+{\Large \textsc{Université de Montpellier}}\\[0.2cm]
+{\large \textcolor{red}{Département de Mathématiques Appliquées}}\\[1.5cm]
+
+% Encadré du titre
+\tcbset{colback=purple!20, colframe=blue, width=\textwidth, arc=3mm, boxrule=0.8mm}
+\begin{tcolorbox}
+    \centering
+    {\huge \bfseries Outstanding 2 : Anova}\\[0.3cm]
+    {\large \textit{Atelier Projet — HAX916X}}
+\end{tcolorbox}
+
+\vfill
+
+% Auteur
+\begin{flushright}
+    \textbf{Réalisé par :}\\
+    DIALLO Ousmane \\
+    ATTOUMANI Ibrahim
+\end{flushright}
+
+\vfill
+
+% Bas de page
+% Bas de page
+
+\vfill
+\noindent
+\begin{minipage}{0.38\textwidth}
+    \includegraphics[width=\linewidth]{vis/ssd.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.40\textwidth}
+    \includegraphics[width=\linewidth]{vis/agro.jpg}
+\end{minipage}
+
+\vspace{0.5cm}
+{\Large Année Universitaire 2025 -- 2026}
+
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}
+\definecolor{navy}{RGB}{11, 11, 69}
+\definecolor{picker}{RGB}{235, 153, 30}
+
+\newpage
+\thispagestyle{empty}
+\begingroup
+\color{black}
+\tableofcontents
+\endgroup
+\newpage
+
+
+
+# \textcolor{red}{1. Modélisation}
+
+L’analyse de la variance (ou \textcolor{purple}{ANOVA}\) est une méthode permettant de modéliser la relation entre une variable quantitative et une ou plusieurs variables qualitatives.
+
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!55!pink,title=Définition 1 : L’analyse de variance à un facteur]
+
+Quand il y a une seule variable explicative qualitative \texttt{A} à \texttt{I} modalités, on parle d’analyse de variance à 1 facteur.
+
+
+Le modèle s’écrit:
+
+$$
+y_{i,k} = \mu + \alpha_i + \epsilon_{i,k}
+$$
+
+où:
+
+\begin{itemize}
+  \item $\mu$ est la moyenne général,
+  \item $\alpha_i$ est l'effet de la modalité i du facteur \texttt{A},
+  \item $\epsilon_{i,k}$  est un résidus avec $k$ l’indice de répétition.
+\end{itemize}
+
+\vspace{0.2cm}
+
+Cette méthode permet la comparaison de \texttt{K} moyennes.
+ 
+\end{tcolorbox}
+
+Nous allons nous intéresser ici au cas de deux variables explicatives, donc à l’analyse de variance à deux facteurs
+
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!55!pink,title=Définition 1 : L’analyse de variance à deux facteurs]
+
+Quand il y a deux variables explicatives qualitatives \texttt{A} et \texttt{B}, et \texttt{Y} une variable à expliquer quantitative, nous notons \texttt{I} le nombre de modalités de la variable \texttt{A} et \texttt{J} celui de la variable \texttt{B}.
+
+
+Le modèle s’écrit:
+
+$$
+y_{i,j,k} = \mu + \alpha_i + \beta_j + \gamma_{i,j} + \epsilon_{i,j,k}
+$$
+
+où:
+
+\begin{itemize}
+  \item $\mu$ est la moyenne général,
+  \item $\alpha_i$ est l'effet de la modalité i du facteur \texttt{A},
+  \item $\beta_j$ est l'effet de la modalité j du facteur \texttt{B},
+  \item $\gamma_{i,j}$ est un terme d'interaction entre les facteurs \texttt{A} et \texttt{B},
+  \item $\epsilon_{i,j,k}$  est un résidus avec $k$ l’indice de répétition.
+\end{itemize}
+
+
+\end{tcolorbox}
+
+
+On teste les effets de $A$, de $B$ et de l'interaction $A \times B$ avec des tests
+de Fisher qui comparent la variabilité expliquée à la variabilité résiduelle.
+
+On commence toujours par tester l'interaction. Si elle est significative, cela
+signifie que l'effet de $A$ dépend de $B$ (et inversement), et il n'est plus utile
+de tester séparément $A$ et $B$.
+
+Les hypothèses du test d'interaction sont :
+
+$$
+(H_0)_{AB} :\forall \quad (i,j), \gamma_{ij} = 0,
+\qquad
+(H_1)_{AB} :\exists (i,j), \quad \gamma_{ij} \neq 0. \qquad (1)
+$$
+
+
+On teste ensuite séparément l'effet de chaque facteur. Par exemple, pour tester
+l'effet du facteur $A$, on compare :
+
+\[
+\begin{cases}
+H_0 : y_{ijk} = \mu + \beta_j + \varepsilon_{ijk} & \text{(modèle sans le facteur $A$)} \\
+H_1 : y_{ijk} = \mu + \alpha_i + \beta_j + \varepsilon_{ijk} & \text{(modèle avec $A$, sans interaction)}
+\end{cases}
+\]
+
+Une fois le modèle final choisi (celui où les facteurs retenus sont significatifs),
+on estime les paramètres $\mu$, $\alpha_i$, $\beta_j$ et $\gamma_{ij}$.
+
+Cependant, le nombre total de paramètres $1 + I + J + IJ$ dépasse le nombre
+de paramètres effectivement estimables : seuls $IJ$ sont indépendants. On doit
+donc imposer $1 + I + J$ contraintes pour rendre le modèle identifiable.
+
+Les contraintes classiques sont :
+
+- \textbf{Analyse par cellule} :
+
+  $$
+  \mu = 0, \quad \alpha_i = 0\ \forall i, \quad \beta_j = 0\ \forall j.
+  $$
+
+- \textbf{Cellule de référence} :
+
+  $$
+  \alpha_1 = 0,\qquad \beta_1 = 0,\quad \gamma_{i1} = 0\ \forall i,\qquad \gamma_{1j} = 0\ \forall j.
+  $$
+
+- \textbf{Contraintes de somme} :
+
+  $$
+  \sum_i \alpha_i = 0,\qquad \sum_j \beta_j = 0,\quad 
+  \sum_j \gamma_{ij} = 0\ \forall i,\quad \sum_i \gamma_{ij} = 0\ \forall j.
+  $$
+
+
+## \textcolor{blue}{1.1. Application directe: anova à effet fixe}
+
+Dans cette partie, nous allons utiliser le jeu de données \textbf{Ozone}.  
+Nous souhaitons analyser la relation entre le maximum journalier de la concentration 
+en ozone (en $\mu$g/m$^3$) et deux facteurs :
+
+\begin{itemize}
+    \item la direction du \texttt{vent}, classée en quatre secteurs : \texttt{Nord}, \texttt{Sud}, \texttt{Est}, \texttt{Ouest},
+    \item la précipitation, classée en deux modalités : \texttt{Sec} et \texttt{Pluie}.
+\end{itemize}
+
+Nous disposons de 112 observations relevées durant l'été 2001.  
+
+La variable $A$ admet $I = 4$ modalités et la variable $B$ a $J = 2$ modalités.
+
+```{r}
+# importation
+ozone <- read.table("data/ozone.txt",header=T)
+# selectionner les variables d'etude
+vars <- c("maxO3", "vent", "pluie" )
+
+# dataframe avec les variables d'etude
+df <- data.frame(ozone[,vars])
+```
+
+Dans la suite, nous utiliserons la fonction \textcolor{purple}{AovSum} du package **FactoMineR**.
+
+
+```{r, warning=FALSE, include=FALSE}
+# Verifie si le package FactoMineR est installe, sinon l'installe
+if (!require(FactoMineR)) {
+  install.packages("FactoMineR")
+  library(FactoMineR)
+} else {
+  library(FactoMineR)
+}
+```
+
+
+```{r, warning=FALSE}
+# modele d'interaction
+mod_inter <- AovSum(maxO3 ~ vent + pluie + vent:pluie, data=df)
+
+# le test de Fisher
+mod_inter$Ftest
+```
+
+La fonction renvoie deux types de résultats : ceux des tests de Fisher et ceux des tests de Student. 
+
+Nous commençons par examiner les résultats des tests de Fisher, qui évaluent l'effet global de chaque facteur et de leur interaction. 
+La première colonne indique les sommes des carrés, la deuxième les degrés de liberté et la troisième les carrés moyens. 
+La quatrième colonne présente la statistique de test F et la cinquième donne la p-value, c'est-à-dire la probabilité d'obtenir une valeur aussi grande si l'hypothèse nulle est vraie. 
+
+Comme la p-value (0.65) est largement supérieure à 5\%, nous ne pouvons pas rejeter l'hypothèse nulle. 
+Nous concluons donc que l'interaction n'est pas significative.
+
+Ainsi, le modèle peut être réécris de la manière suivant:
+
+$$
+y_{i,j,k} = \mu + \alpha_i + \beta_j + \epsilon_{i,j,k} \quad (2)
+$$
+
+Nous estimons alors le modèle sans interaction $(2)$.
+
+```{r}
+# modele sans interaction
+mod_sans_inter <- AovSum(maxO3 ~ vent + pluie, data=df)
+
+# le test de Fischer
+mod_sans_inter$Ftest
+```
+La p-value associée à l'effet **vent** ($Pr(>F) = 0.1048$) est supérieur à 5\% donc on conclut à la non significativité du facteur **vent**. C'est à dire il n'y a pas de d'effet de la directition du vent sur le maximux d'ozone journalier. Ainsi, on obtient un modèle d'analyse de variance un seul facteur (**pluie**):
+
+
+$$
+y_{i,j,k} = \mu + \beta_j + \epsilon_{i,j,k} \quad (2)
+$$
+
+
+\begin{tcolorbox}[colback=green!10,colframe=black!55!pink,title=Remarque : La significativité su facteur $\alpha_i$]
+
+Si le facteur $\alpha_i$ étais significative, on aurait garder le modèle sous $(H_1)_A$:
+
+$$
+y_{i,j,k} = \mu + \alpha_i + \beta_j + \epsilon_{i,j,k}
+$$
+
+Puis, on aurait estimer les coefficients du modèle.
+\end{tcolorbox}
+
+Nous allons à présent ajuster le modèle d'analyse de variance un seul facteur:
+
+```{r}
+# modele a un facteur (pluie)
+mod_simple <- AovSum(maxO3 ~ pluie, data=ozone)
+
+# le test de Fisher
+mod_simple$Ftest
+```
+La probabilité critique associée à l’effet **pluie** ($Pr(>F) = 1.157e-07$) est très faible :
+
+on en conclut que le facteur **pluie** affecte le maximum d’ozone journalier. Pour interpréter cet effet, il faut estimer les coefficients. 
+
+
+Les estimations des coeeficients dépende aux contraintes utilisées. Tous les résultats sur l'estimation des coefficients sont donnés dans l'objet **Ttest**.
+
+```{r}
+# le test de Studebt
+mod_simple$Ttest
+```
+On obtient une matrice comportant pour chaque lignes, 4 colonnes: son estimation (**Estimate**)  son écart-type
+estimé (**Std. Error**), et enfin la valeur de la statistique de test (**t value**) et de
+la probabilité critique ($Pr(>|t|)$) associées au test de Student:
+
+$$
+(H_0): \forall i, \quad \alpha_i = 0 \quad vs \quad \exists i, \quad \alpha_i \neq 0 
+$$
+
+L'estimation de $\mu$ (87.12), notée Intercept, correspond à la moyenne du maximum d'ozone. 
+L'effet du temps humide, $\alpha_1$, est estimé à une diminution de $-13.72\,\mu g/m^{3}$ du maximum d'ozone. 
+Comme les coefficients doivent vérifier $\alpha_1 + \alpha_2 = 0$ (contrainte sur la somme des coefficients), l'effet du temps sec est donc de $+13.72\,\mu g/m^{3}$.
+

@@ -1,0 +1,235 @@
+---
+output: pdf_document
+fontsize: 12pt
+mainfont: "Times New Roman"
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage[table]{xcolor}
+  - \usepackage{graphicx}
+  - \usepackage{lscape}
+  - \usepackage{booktabs}
+  - \usepackage{tikz}
+  - \usepackage{amsmath}
+  - \usepackage{tcolorbox}
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \setlength{\headheight}{15.35403pt}
+  - \addtolength{\topmargin}{-2.5pt}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{\textcolor{purple}{M2 SSD}}
+  - \fancyhead[C]{\textcolor{purple}{Atelier Projet \textbf{-} HAX916X}}
+  - \fancyhead[R]{\textcolor{purple}{2025 \textbf{-} 2026}}
+  - \fancyfoot[C]{\thepage}
+  - \renewcommand{\contentsname}{Table des matières}
+---
+
+\begin{titlepage}
+\definecolor{umcolor}{RGB}{85, 37, 130}
+
+\begin{center}
+
+% Logo en haut
+\includegraphics[width=0.3\linewidth]{vis/logo_M.png}\\[1.5cm]
+
+% Université et département
+{\Large \textsc{Université de Montpellier}}\\[0.2cm]
+{\large \textcolor{red}{Département de Mathématiques Appliquées}}\\[1.5cm]
+
+% Encadré du titre
+\tcbset{colback=purple!20, colframe=blue, width=\textwidth, arc=3mm, boxrule=0.8mm}
+\begin{tcolorbox}
+    \centering
+    {\huge \bfseries Outstanding 2 : Régression linéaire et ANOVA}\\[0.3cm]
+    {\large \textit{Atelier Projet — HAX916X}}
+\end{tcolorbox}
+
+\vfill
+
+% Auteur
+\begin{flushright}
+    \textbf{Réalisé par :}\\
+    DIALLO Ousmane \\
+    ATTOUMANI Ibrahim
+\end{flushright}
+
+\vfill
+
+% Bas de page
+% Bas de page
+
+\vfill
+\noindent
+\begin{minipage}{0.38\textwidth}
+    \includegraphics[width=\linewidth]{vis/ssd.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.40\textwidth}
+    \includegraphics[width=\linewidth]{vis/agro.jpg}
+\end{minipage}
+
+\vspace{0.5cm}
+{\Large Année Universitaire 2025 -- 2026}
+
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}
+\definecolor{navy}{RGB}{11, 11, 69}
+\definecolor{picker}{RGB}{235, 153, 30}
+
+\newpage
+\thispagestyle{empty}
+\begingroup
+\color{black}
+\tableofcontents
+\endgroup
+\newpage
+
+# \textcolor{red}{1. Introduction}
+
+Commençons par un exemple afin de fixer les idées. On cherche à savoir s’il est possible d’expliquer le
+taux maximal d’ozone de la journée par la température T12 à midi. Les données
+sont :
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcccccccccc}
+\hline
+Température à 12h & 23.8 & 16.3 & 27.2 & 7.1 & 25.1 & 27.5 & 19.4 & 19.8 & 32.2 & 20.7 \\
+O$_3$ max & 115.4 & 76.8 & 113.8 & 81.6 & 115.4 & 125.0 & 83.6 & 75.2 & 136.8 & 102.8 \\
+\hline
+\end{tabular}
+\caption{10 données journalières de température et d’ozone.}
+\label{tab:temp_o3}
+\end{table}
+
+L'objectif de la régression est demodéliser la variable Ozone (\textcolor{purple}{$O_3$}) en fonction de la température à 12h (\textcolor{purple}{$T_{12}$}).
+
+Avant toute analyse, il est intéressant de représenter les données:
+
+\begin{tcolorbox}[colback=green!15,colframe=blue!70!pink,title=Code R : Représentation de la température en fonction de l'ozone]
+\footnotesize
+\begin{verbatim}   
+# Création des vecteurs de données
+t12 <- c(23.8, 16.3, 27.2, 7.1, 25.1, 27.5,
+19.4, 19.8, 32.2, 20.7)
+O3_max <- c(115.4, 76.8, 113.8, 81.6, 115.4, 125.0, 83.6, 75.2, 136.8, 102.8)
+
+# Création du data frame
+df <- data.frame(t12=t12, O3_max = O3_max)
+titre <- "Représentation de la température en fonction de l'ozone"
+# Affichage
+plot(x = t12, y = O3_max, pch = 18, col="navy", lwd=3, main=titre, cex.main=1)
+\end{verbatim}
+\end{tcolorbox}
+
+```{r, fig.height=3.7, fig.width=4.9, fig.align='center', echo=FALSE}
+# Création des vecteurs de données
+t12 <- c(23.8, 16.3, 27.2, 7.1, 25.1, 27.5,
+19.4, 19.8, 32.2, 20.7)
+O3_max <- c(115.4, 76.8, 113.8, 81.6, 115.4, 125.0, 83.6, 75.2, 136.8, 102.8)
+
+# Création du data frame
+df <- data.frame(t12=t12, O3_max = O3_max)
+titre <- "Représentation de la température en fonction de l'ozone"
+
+# Affichage
+plot(x = t12, y = O3_max, pch = 18, col="navy", lwd=3, main=titre, cex.main=1)
+```
+
+\newpage
+
+# \textcolor{red}{2. Modélisation}
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!550!pink,title=Définition 1 : Modèle de régression linéaire simple]
+
+Un modèle de régression linéaire simple
+est défini par une équation de la forme :
+
+$$
+\forall i \in \{1,\dots,n\}, \quad y_i = \beta_1 + \beta_2x_i + \epsilon_i
+$$
+
+Les quantités $\epsilon_i$ viennent du fait que les points ne sont jamais parfaitement alignés sur une droite.
+On les appelle les erreurs (ou bruits) et elles sont supposées aléatoires.
+\end{tcolorbox}
+
+On impose les hypothèses suivantes sur ces quantités:
+
+$$
+(H) 
+\begin{cases}
+(H_1): \mathbb{E[\epsilon_i]}=0, \quad \forall i \\
+(H_2): \mathbb{C}ov[\epsilon_i,\epsilon_j]= \delta_{ij} \sigma^2 \quad \forall (i,j)
+\end{cases}
+$$
+
+Notons que le
+modèle de régression linéaire simple peut encore s’écrire de façon vectorielle :
+
+$$
+Y = \beta_1 \mathbb{1} + \beta_2X + \epsilon,
+$$
+
+où:
+
+\begin{itemize}
+   \item le vecteur $Y = [y_1,\dots, y_n]^t$ est aléatoire de dimension $n$,
+   \item le vecteur$\mathbb{1} = [1,\dots, 1]^t$ est le vecteur de $\mathbb{R}^n$ dont les $n$ composantes valent toutes 1,
+   \item le vecteur $X = [x_1,\dots, x_n]^t$ est aléatoire de dimension $n$ donné (non aléatoire),
+   \item les coefficients $\beta_1$ et $\beta_2$ sont les paramètres inconnus (mais non aléatoires !) du modèle,
+   \item le vecteur $\epsilon = [\epsilon_1,\dots, \epsilon_n]^t$ est aléatoire de dimension n.
+\end{itemize}
+
+\begin{tcolorbox}[colback=pink!10,colframe=red!550!pink,title=Définition 2 : Estimateurs des Moindres Carrés Ordinaires]
+
+On appelle \text{estimateurs des Moindres Carrés Ordinaires} (MCO) $\hat{\beta}_1$ et $\hat{\beta}_2$ les valeurs minimisant la quantité :
+
+$$
+S(\beta_1, \beta_2) = \sum_{i=1}^{n} (y_i - \beta_1 - \beta_2 x_i)^2.
+$$
+
+Autrement dit, la droite des moindres carrés minimise la somme des carrés des distances verticales des points $(x_i, y_i)$ du nuage à la droite ajustée $y = \hat{\beta}_1 + \hat{\beta}_2 x$.
+
+Les estimateurs des MCO ont pour expressions :
+
+$$
+\hat{\beta}_1 = \bar{y}-\hat{\beta}_2 \bar{x}, \qquad \hat{\beta}_2= \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{(x_i - \bar{x})^2} = \frac{\mathbb{C}ov(x,y)}{\sigma_x^2}
+$$
+\end{tcolorbox}
+
+## \textcolor{blue}{2.1. Application direct sous R}
+
+Dans cette partie, nous allons réaliser une application direct de regression linéaire simple de la température à 12h **t12** en fonction de l'ozone sous R. Nous utiliserons la fonction \textcolor{red}{lm} disponible par défaut dans R.
+
+
+```{r, fig.height=3.7, fig.width=4.9, fig.align='center'}
+# creation du modèle
+model <- lm(O3_max ~ t12, data=df)
+
+# Affichage avec la droite de regression ajustee
+plot(x = t12, y = O3_max, pch = 18, col="navy", lwd=3, main=titre, cex.main=1)
+ # ajout de la droite de regression ajustee
+abline(model, col = "red", lwd = 1.5)
+```
+
+```{r}
+# resume du modele
+summary(model)
+```
+
+
+Les sorties du logiciel donnent les valeurs estimées 
+$\hat{\beta}_1 = 45.0044$ et $\hat{\beta}_2 = 2.6306$, 
+ainsi que leurs écarts-types respectifs 
+$\hat{\sigma}_1 = 13.8050$ et $\hat{\sigma}_2 = 0.6029$. 
+
+D'après le test d'hypothèse :
+
+$$
+H_0 : \beta_i = 0 \quad \text{vs} \quad H_1 : \beta_i \neq 0, \qquad i = 1,2,
+$$
+
+on peut constater que les coefficients sont significatifs. En effet, les p-values $Pr(>|t|)$ des paramètres $\hat{\beta}_1$ et $\hat{\beta}_2$ valent respectivement $0.0115$ et $0.0024$, ce qui est strictement inférieur à $0.05$ pour un test de niveau $5\%$. On rejete donc l'hypothèse $(H_0)$ au profit de $(H_1)$.

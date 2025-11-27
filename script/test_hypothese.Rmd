@@ -1,0 +1,541 @@
+---
+output: pdf_document
+fontsize: 12pt
+mainfont: "Times New Roman"
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage[table]{xcolor}
+  - \usepackage{graphicx}
+  - \usepackage{lscape}
+  - \usepackage{booktabs}
+  - \usepackage{tikz}
+  - \usepackage{amsmath}
+  - \usepackage{tcolorbox}
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \setlength{\headheight}{15.35403pt}
+  - \addtolength{\topmargin}{-2.5pt}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{\textcolor{purple}{M2 SSD}}
+  - \fancyhead[C]{\textcolor{purple}{Atelier Projet \textbf{-} HAX916X}}
+  - \fancyhead[R]{\textcolor{purple}{2025 \textbf{-} 2026}}
+  - \fancyfoot[C]{\thepage}
+  - \renewcommand{\contentsname}{Table des matières}
+---
+
+\begin{titlepage}
+\definecolor{umcolor}{RGB}{85, 37, 130}
+
+\begin{center}
+
+% Logo en haut
+\includegraphics[width=0.3\linewidth]{vis/logo_m.png}\\[1.5cm]
+
+% Université et département
+{\Large \textsc{Université de Montpellier}}\\[0.2cm]
+{\large \textcolor{red}{Département de Mathématiques Appliquées}}\\[1.5cm]
+
+% Encadré du titre
+\tcbset{colback=green!20, colframe=red, width=\textwidth, arc=3mm, boxrule=0.8mm}
+\begin{tcolorbox}
+    \centering
+    {\huge \bfseries Outstanding  : Tests d'hypothèses}\\[0.3cm]
+    {\large \textit{Atelier Projet — HAX916X}}
+\end{tcolorbox}
+
+\vfill
+
+% Auteur
+\begin{flushright}
+    \textbf{Réalisé par :}\\
+    DIALLO Ousmane \\
+    ATTOUMANI Ibrahim
+\end{flushright}
+
+\vfill
+
+% Bas de page
+% Bas de page
+
+\vfill
+\noindent
+\begin{minipage}{0.40\textwidth}
+    \includegraphics[width=\linewidth]{vis/ssd.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.40\textwidth}
+    \includegraphics[width=\linewidth]{vis/agro.jpg}
+\end{minipage}
+
+\vspace{0.5cm}
+{\Large Année Universitaire 2025 -- 2026}
+
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}
+\definecolor{navy}{RGB}{11, 11, 69}
+\definecolor{picker}{RGB}{235, 153, 30}
+
+\newpage
+\thispagestyle{empty}
+\begingroup
+\color{black}
+\tableofcontents
+\endgroup
+\newpage
+
+
+# \textcolor{red}{1. Introduction}
+
+Nous allons illustrer un problème de décision consistant à trancher entre deux hypothèses contradictoires.  
+Dans une telle situation, il est impossible de choisir une hypothèse sans prendre un certain risque : on peut en effet commettre des erreurs.  
+Ces erreurs sont appelées **erreur de première espèce** et **erreur de seconde espèce**.
+
+En général, on privilégie l’hypothèse $H_0$ (appelée \textit{hypothèse nulle}) par rapport à $H_1$ (appelée \textit{hypothèse alternative}).  
+En effet, il est souvent préférable de ne pas rejeter $H_0$ tant qu’on ne dispose pas d’assez de preuves contraires.  
+Par analogie avec le domaine judiciaire, il est préférable **d’innocenter un coupable que d’enfermer un innocent.**
+
+\textcolor{green}{Exemple : illustration du concept}
+
+On juge une personne et on formule les hypothèses suivantes :
+
+\vspace{0.2cm}
+
+$$
+H_0 : \text{personne innocente} \quad \text{et} \quad H_1 : \text{personne coupable.}
+$$
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+ & \textbf{Personne innocente ($\Theta_0$)} & \textbf{Personne coupable ($\Theta_1$)} \\ \hline
+\textbf{Innocenter la personne} & $1 - \alpha_\varphi$ & \text{(Erreur type 2) } $\beta_\varphi$ \\ \hline
+\textbf{Condamner la personne} & \text{(Erreur type 1) } $\alpha_\varphi$ & $1 - \beta_\varphi$ (la puissance) \\ \hline
+\end{tabular}
+\end{center}
+
+\vspace{0.3cm}
+
+Cet exemple illustre que :
+\begin{itemize}
+    \item une erreur de type 1 consiste à condamner une personne innocente (rejeter $H_0$ alors qu’il est vrai) ;
+    \item une erreur de type 2 consiste à innocenter une personne coupable (accepter $H_0$ alors qu’il est faux).
+\end{itemize}
+
+Ainsi, dans la plupart des situations, on cherche à **contrôler le risque d’erreur de première espèce** (noté $\alpha$), car il correspond à une décision trop audacieuse, potentiellement injuste.
+
+\newpage
+
+# \textcolor{red}{2. Test d’hypothèse : cadre général}
+
+Soit $(\mathcal{X}, \mathcal{B}, (P_\theta)_{\theta \in \Theta})$ un modèle statistique.  
+
+où :
+\begin{itemize}
+    \item $\mathcal{X}$ est l’\textbf{espace d’observation} ;
+    \item $\mathcal{B}$ est la \textbf{tribu} (ou $\sigma$-algèbre) sur $\mathcal{X}$;
+    \item $(P_\theta)_{\theta \in \Theta}$ est une \textbf{famille de probabilités} sur $(\mathcal{X}, \mathcal{B})$.
+\end{itemize}
+
+On cherche à trancher entre les deux hypothèses suivantes :
+
+$$
+(H_0) : \theta \in \Theta_0 \quad \text{et} \quad (H_1) : \theta \in \Theta_1
+$$
+
+avec $\Theta_0 \cap \Theta_1 = \emptyset$.
+
+## \textcolor{blue}{2.1. Cas d’un test pur}
+
+On appelle \textbf{statistique de test pur} toute fonction $\varphi : \mathcal{X} \to \{0,1\}$.  
+La règle de décision associée à $\varphi$ est :
+
+$$
+\text{décider } (H_1) \text{ si } \varphi(x) = 1, \quad \text{et } (H_0) \text{ si } \varphi(x) = 0.
+$$
+
+\noindent
+On appelle \textbf{région critique du test} la zone qui conduit à décider $(H_1)$ :
+
+$$
+R_\varphi = \{ \varphi = 1 \}.
+$$
+
+Deux types d’erreurs sont possibles :
+
+\begin{itemize}
+  \item \textbf{Erreur de première espèce (type 1)} : décider $(H_1)$ alors que $(H_0)$ est vraie.
+  $$
+  \alpha_\varphi(\theta) = P_\theta(R_\varphi) = E_\theta(\varphi), \quad \theta \in \Theta_0.
+  $$
+  
+  \item \textbf{Erreur de deuxième espèce (type 2)} : décider $(H_0)$ alors que $(H_1)$ est vraie.
+  $$
+  \beta_\varphi(\theta) = P_\theta(R_\varphi^c) = E_\theta(1 - \varphi), \quad \theta \in \Theta_1.
+  $$
+\end{itemize}
+
+\noindent
+On définit aussi la \textbf{puissance du test} :
+
+$$
+\eta_\varphi(\theta) = 1 - \beta_\varphi(\theta) = P_\theta(R_\varphi) = E_\theta(\varphi),
+$$
+
+qui représente la probabilité de décider $(H_1)$ à raison.
+
+## \textcolor{blue}{2.2. Cas d’un test randomisé}
+
+On appelle \textbf{statistique de test randomisée} toute fonction $\Phi : \mathcal{X} \to [0,1]$.  
+La règle de décision associée à $\Phi$ est la probabilité d’accepter $(H_1)$ quand $H_0$ est vraie.  
+Les erreurs sont alors :
+
+$$
+\alpha_\Phi(\theta) = E_\theta(\Phi), \quad \theta \in \Theta_0 \quad \text{et} \quad
+\beta_\Phi(\theta) = E_\theta(1 - \Phi), \quad \theta \in \Theta_1.
+$$
+
+La puissance du test est alors :
+$$
+\eta_\Phi(\theta) = 1 - \beta_\Phi(\theta) = E_\theta(\Phi) = P_\theta(R_\Phi),
+$$
+
+qui représente la probabilité de décider $(H_1)$ à raison.
+
+# \textcolor{red}{3. Cas Gaussien}
+
+On considère un échantillon i.i.d. $Y_1, Y_2, \dots, Y_n$ de loi  
+$$
+Y_i \sim \mathcal{N}(m, \sigma^2),
+$$  
+avec $m \in \mathbb{R}$ et $\sigma > 0$.
+
+L’objectif est de tester une hypothèse portant sur la moyenne $m$.  
+Deux cas sont possibles selon que la variance $\sigma^2$ est **connue** ou **inconnue**.
+
+
+## \textcolor{blue}{3.1. Test concernant $m$ avec variance supposée connue}
+
+On suppose que $\sigma^2=\sigma_0^2$ est connue.  
+Les tests seront alors basés sur la fonction pivotale suivante :
+
+$$
+Z_n = \frac{\sqrt{n}(\overline{Y}_n - m_0)}{\sigma_0} = \frac{\sqrt{n}(\overline{Y}_n - m)}{\sigma_0} + \frac{\sqrt{n}(m - m_0)}{\sigma_0}
+$$
+
+où $\overline{Y}_n = \frac{1}{n}\sum_{i=1}^n Y_i$ et $m_0$ est la valeur de $m$ sous $(H_0)$.
+
+Sous $(H_0)$ :
+$$
+\overline{Y}_n \sim \mathcal{N}\left(m, \frac{\sigma_0^2}{n}\right) \quad \Rightarrow \quad Z_n \sim  \mathcal{N}(\frac{\sqrt{n}(m - m_0)}{\sigma_0},1)
+$$
+
+
+### \textcolor{green}{3.1.1. Test bilatéral}
+
+$$
+(H_0): m = m_0 \quad \text{vs} \quad (H_1): m \neq m_0
+$$
+
+Sous $(H_0)$, la statistique $Z_n$ suit une loi $\mathcal{N}(0,1)$.  
+Sous $(H_1)$, la valeur absolue $|Z_n|$ tend à être plus grande que celle d’une variable normale centrée réduite.  
+
+Ainsi, la région critique du test (au risque $\alpha \in ]0,1[$) est :
+
+$$
+R_\alpha = \left\{ (y_1, \dots, y_n) : |z_n| > u_{1 - \frac{\alpha}{2}} \right\}
+$$
+
+où $u_{1 - \frac{\alpha}{2}}$ désigne le quantile d’ordre $1 - \frac{\alpha}{2}$ de la loi $\mathcal{N}(0,1)$.
+
+
+### \textcolor{green}{3.1.2. Test unilatéral}
+
+  - \text{Cas à droite} :  
+
+$$
+(H_0): m \leq m_0 \quad \text{vs} \quad (H_1): m > m_0
+$$
+
+  - \text{Cas à gauche} :  
+  
+$$
+(H_0): m \geq m_0 \quad \text{vs} \quad (H_1): m < m_0
+$$
+
+Sous $(H_0)$, on a toujours $Z_n \sim \mathcal{N}(0,1)$.  
+Sous $(H_1)$, $Z_n$ aura tendance à être plus grande (ou plus petite) qu’une variable normale centrée réduite.
+
+La région critique (au risque $\alpha$) est donnée par :
+
+$$
+R_\alpha =
+\begin{cases}
+\{ (y_1, \dots, y_n) : z_n > u_{1 - \alpha} \}, & \text{si } (H_1): m > m_0, \\
+\{ (y_1, \dots, y_n) : z_n < -u_{1 - \alpha} \}, & \text{si } (H_1): m < m_0.
+\end{cases}
+$$
+
+
+## \textcolor{blue}{3.2. Test concernant $m$ avec variance supposée inconnue}
+
+Lorsque $\sigma^2$ est **inconnue**, on l’estime à partir de l’échantillon à l’aide de la variance empirique corrigée :
+
+$$
+{S'}_n^2 = \frac{1}{n - 1} \sum_{j=1}^n (Y_j - \overline{Y}_n)^2
+$$
+
+La statistique de test devient alors :
+
+$$
+T_n = \frac{\sqrt{n}(\overline{Y}_n - m_0)}{S'_n} = \frac{\sqrt{n}(\overline{Y}_n - m)}{S'_n}+ \frac{\sqrt{n}(m - m_0)}{S'_n}
+$$
+
+Sous $(H_0)$, cette statistique suit une loi de Student à $(n - 1)$ degrés de liberté :
+
+$$
+T_n \sim \mathcal{T}(n - 1)
+$$
+
+où $m_0$ est la valeur de $m$ sous $(H_0)$.
+
+### \textcolor{green}{3.2.1. Test bilatéral}
+
+$$
+(H_0): m = m_0 \quad \text{vs} \quad (H_1): m \neq m_0
+$$
+
+Sous $(H_0)$, la statistique $T_n$ suit une loi $\mathcal{T}(n - 1)$ Student à $n-1$ degrés de libertés.  
+Sous $(H_1)$, la valeur absolue $|T_n|$ tend à être plus grande que celle d’une variable de loi $\mathcal{T}(n - 1)$.  
+
+Ainsi, la région critique du test (au risque $\alpha \in ]0,1[$) est :
+
+$$
+R_\alpha = \left\{ (y_1, \dots, y_n) : |t_n| > t_{1 - \frac{\alpha}{2}(n - 1)} \right\}
+$$
+
+### \textcolor{green}{3.2.2. Test unilatéral}
+
+  - \text{Cas à droite} :  
+
+$$
+(H_0): m \leq m_0 \quad \text{vs} \quad (H_1): m > m_0
+$$
+
+  - \text{Cas à gauche} :  
+  
+$$
+(H_0): m \geq m_0 \quad \text{vs} \quad (H_1): m < m_0
+$$
+
+Sous $(H_0)$, on a toujours $T_n \sim \mathcal{T}{(n-1)}$.  
+Sous $(H_1)$, $Z_n$ aura tendance à être plus grande (ou plus petite) qu’une variable de loi $\mathcal{T}{(n-1)}$.
+
+La région critique (au risque $\alpha$) est donnée par :
+
+$$
+R_\alpha =
+\begin{cases}
+\{ (y_1, \dots, y_n) : t_n > t_{1 - \alpha}(n-1) \}, & \text{si } (H_1): m > m_0, \\
+\{ (y_1, \dots, y_n) : t_n < -t_{1 - \alpha}(n-1) \}, & \text{si } (H_1): m < m_0.
+\end{cases}
+$$
+
+## \textcolor{blue}{3.3. Test concernant $\sigma^2$ avec moyenne $m$ supposée connue}
+
+Lorsque $m = m_0$ est **connue**, on peut estimer la variance à partir de l’échantillon par :
+
+$$
+S_n^2 = \frac{1}{n} \sum_{j=1}^n (Y_j - m_0)^2
+$$
+
+La statistique de test pivotale est alors :
+
+$$
+Z_n = \frac{n S_n^2}{\sigma_0^2} = \frac{\sigma^2}{\sigma_0^2} \frac{n S_n^2}{\sigma^2}
+$$
+avec $\frac{n S_n^2}{\sigma^2} \sim \chi^2(n)$.
+
+Ainsi, sous $(H_0)$, cette statistique suit une loi du $\chi^2$ à $n$ degrés de liberté :
+
+$$
+Z_n \sim \chi^2(n)
+$$
+
+où $\sigma_0^2$ est la valeur de $\sigma^2$ sous $(H_0)$.
+
+### \textcolor{green}{3.3.1. Test bilatéral}
+
+$$
+(H_0): \sigma^2 = \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 \neq \sigma_0^2
+$$
+Sous $(H_0)$, $Z_n \sim \chi^2(n)$ et sous $(H_1)$, $Z_n$ aura tendance à être plus grande ou plus petite qu’une variable de loi $\chi^2(n)$.
+
+La région critique du test bilatéral (au risque $\alpha \in ]0,1[$) est donnée par :
+
+$$
+R_\alpha = \left\{ (y_1, \dots, y_n) : Z_n < \chi^2_{\frac{\alpha}{2}}(n) \quad \text{ou} \quad Z_n > \chi^2_{1 - \frac{\alpha}{2}}(n) \right\}
+$$
+
+
+
+### \textcolor{green}{3.3.2. Test unilatéral}
+
+  - \text{Cas à droite} :  
+
+$$
+(H_0): \sigma^2 \leq \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 > \sigma_0^2
+$$
+
+  - \text{Cas à gauche} :  
+  
+$$
+(H_0): \sigma^2 \geq \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 < \sigma_0^2
+$$
+
+Sous $(H_0)$, $Z_n \sim \chi^2(n)$.  
+Sous $(H_1)$, la valeur de $Z_n$ tend à être plus grande (cas à droite) ou plus petite (cas à gauche) que celle d’une variable de loi $\chi^2(n)$.
+
+La région critique du test (au risque $\alpha \in ]0,1[$) est :
+
+$$
+R_\alpha =
+\begin{cases}
+\{ (y_1, \dots, y_n) : Z_n > \chi^2_{1 - \alpha}(n) \}, & \text{si } H_1: \sigma^2 > \sigma_0^2, \\
+\{ (y_1, \dots, y_n) : Z_n < \chi^2_{\alpha}(n) \}, & \text{si } H_1: \sigma^2 < \sigma_0^2.
+\end{cases}
+$$
+
+## \textcolor{blue}{3.4. Test concernant $\sigma^2$ avec moyenne $m$ supposée inconnue}
+
+Lorsque $m$ est **inconnue**, on peut estimer la variance à partir de l’échantillon par :
+
+$$
+{S'}_n^2 = \frac{1}{n-1} \sum_{j=1}^n (Y_j - \overline{Y_n})^2
+$$
+
+
+La statistique de test pivotale est alors :
+
+$$
+Z_n = \frac{(n-1) {S'}_n^2}{\sigma_0^2} = \frac{\sigma^2}{\sigma_0^2} \frac{(n-1) {S'}_n^2}{\sigma^2}
+$$
+avec $\frac{(n-1) {S'}_n^2}{\sigma^2} \sim \chi^2(n-1)$.
+
+Ainsi, sous $(H_0)$, cette statistique suit une loi du $\chi^2$ à $n$ degrés de liberté :
+
+$$
+Z_n \sim \chi^2(n)
+$$
+
+où $\sigma_0^2$ est la valeur de $\sigma^2$ sous $(H_0)$.
+
+### \textcolor{green}{3.4.1. Test bilatéral}
+
+$$
+(H_0): \sigma^2 = \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 \neq \sigma_0^2
+$$
+Sous $(H_0)$, $Z_n \sim \chi^2(n-1)$ et sous $(H_1)$, $Z_n$ aura tendance à être plus grande ou plus petite qu’une variable de loi $\chi^2(n-1)$.
+
+La région critique du test bilatéral (au risque $\alpha \in ]0,1[$) est donnée par :
+
+$$
+R_\alpha = \left\{ (y_1, \dots, y_n) : Z_n < \chi^2_{\frac{\alpha}{2}}(n-1) \quad \text{ou} \quad Z_n > \chi^2_{1 - \frac{\alpha}{2}}(n-1) \right\}
+$$
+
+
+
+### \textcolor{green}{3.4.2. Test unilatéral}
+
+  - \text{Cas à droite} :  
+
+$$
+(H_0): \sigma^2 \leq \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 > \sigma_0^2
+$$
+
+  - \text{Cas à gauche} :  
+  
+$$
+(H_0): \sigma^2 \geq \sigma_0^2 \quad \text{vs} \quad (H_1): \sigma^2 < \sigma_0^2
+$$
+
+Sous $(H_0)$, $Z_n \sim \chi^2(n-1)$.  
+Sous $(H_1)$, la valeur de $Z_n$ tend à être plus grande (cas à droite) ou plus petite (cas à gauche) que celle d’une variable de loi $\chi^2(n-1)$.
+
+La région critique du test (au risque $\alpha \in ]0,1[$) est :
+
+$$
+R_\alpha =
+\begin{cases}
+\{ (y_1, \dots, y_n) : Z_n > \chi^2_{1 - \alpha}(n-1) \}, & \text{si } H_1: \sigma^2 > \sigma_0^2, \\
+\{ (y_1, \dots, y_n) : Z_n < \chi^2_{\alpha}(n-1) \}, & \text{si } H_1: \sigma^2 < \sigma_0^2.
+\end{cases}
+$$
+
+
+# \textcolor{red}{4. Test asymptotique dans le cas quelconque}
+
+Considérons un échantillon i.i.d. $Y_1, \dots, Y_n$ d'espérance $m$ et de variance $\sigma^2$.  
+Les tests seront basés sur le Théorème Central Limite (TCL) :
+
+$$
+\frac{\sqrt{n} (\overline{Y}_n - m)}{\sigma} \approx \mathcal{N}(0,1)
+$$
+
+Ces tests sont donc **asymptotiques**, c’est-à-dire appropriés uniquement pour des tailles d’échantillon suffisamment grandes ($n \ge 30$).
+
+Soit $\hat{\sigma}_n^2$ un estimateur tel que $\hat{\sigma}_n^2 \xrightarrow{\mathbb{P}} \sigma^2$. Alors, par le TCL et Slutsky :
+
+$$
+Z_n := \frac{\sqrt{n} (\overline{Y}_n - m_0)}{\sqrt{\hat{\sigma}_n^2}} \xrightarrow{L} \mathcal{N}(0,1)
+$$
+
+où $m_0$ est la valeur de $m$ sous $(H_0)$.
+
+
+
+## \textcolor{blue}{4.1. Test bilatéral}
+
+$$
+(H_0): m = m_0 \quad \text{vs} \quad (H_1): m \neq m_0
+$$
+
+Sous $(H_0)$ et pour $n$ grand : $Z_n \sim \mathcal{N}(0,1)$.  
+Sous $(H_1)$, $|Z_n|$ aura tendance à être plus grande que celle d’une variable de loi $\mathcal{N}(0,1)$.
+
+La région critique du test bilatéral (au risque $\alpha \in ]0,1[$) est donnée par :
+
+$$
+R_\alpha = \left\{ (Y_1, \dots, Y_n) : |Z_n| > u_{1 - \frac{\alpha}{2}} \right\}
+$$
+
+
+## \textcolor{blue}{4.2. Test unilatéral}
+
+  - \text{Cas à droite} :  
+
+$$
+(H_0): m \leq m_0 \quad \text{vs} \quad (H_1): m > m_0
+$$
+
+  - \text{Cas à gauche} :  
+
+$$
+(H_0): m \geq m_0 \quad \text{vs} \quad (H_1): m < m_0
+$$
+
+Sous $(H_0)$ et pour $n$ grand : $Z_n \sim \mathcal{N}(0,1)$.  
+Sous $(H_1)$, $Z_n$ aura tendance à être plus grande (cas à droite) ou plus petite (cas à gauche) qu’une variable de loi $\mathcal{N}(0,1)$.
+
+La région critique du test unilatéral (au risque $\alpha \in ]0,1[$) est :
+
+$$
+R_\alpha =
+\begin{cases}
+\{ (Y_1, \dots, Y_n) : Z_n > u_{1 - \alpha} \}, & \text{si } H_1: m > m_0 \ (\text{cas à droite}), \\
+\{ (Y_1, \dots, Y_n) : Z_n < -u_{1 - \alpha} \}, & \text{si } H_1: m < m_0 \ (\text{cas à gauche}).
+\end{cases}
+$$
