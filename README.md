@@ -59,11 +59,6 @@ La question centrale devient alors :
 
 Cette question oriente la réflexion statistique menée dans ce projet.
 
-### 🖼️ Illustration de l’expérience
-
-```{r, echo=FALSE, out.width="80%"}
-knitr::include_graphics("vis/exp1.jpg")
-```
 ---
 ## 🌱 Deuxième expérience : interactions pairwise entre 10 variétés d’avoine
 
