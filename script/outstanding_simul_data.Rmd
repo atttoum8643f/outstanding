@@ -154,6 +154,7 @@ b_masse2 <- round(runif(n, 0.5,5),2)
 data <- data.frame(
   var1,
   var2,
+  traitements,
   taille1_t1,
   taille1_t2,
   taille1_t3,
