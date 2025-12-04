@@ -152,6 +152,7 @@ b_masse2 <- round(runif(n, 0.5,5),2)
 
 # Création du dataframe final
 data <- data.frame(
+  ID,
   var1,
   var2,
   traitements,
@@ -170,9 +171,10 @@ data <- data.frame(
   b_masse1,
   b_masse2
 )
-row.names(data)=ID
+# row.names(data)=ID
+data_simul <- data
 
-View(data)
+write.png(data_simul, "C:/Users/Happy/Desktop/outstanding/vis/moytype.png", row.names = FALSE)
 ```
     
 
@@ -239,7 +241,7 @@ colnames(ecarts_df) <- c("variete1", "variete2", "EcartZ")
 # Graphe d’écarts moyens
 library(ggplot2)
 
-ggplot(ecarts_df, aes(x = variete1, y = EcartZ, fill = variete2)) +
+p <- ggplot(ecarts_df, aes(x = variete1, y = EcartZ, fill = variete2)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(
