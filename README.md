@@ -150,3 +150,15 @@ Méthodes utilisées :
 - **Bonferroni**
 
 Cela permet de **ne pas sous-estimer l’erreur de première espèce**.
+
+---
+## L'organisation du projet 
+
+Le projet est organisé en plusieurs dossiers :
+
+  - **data/** contient l’ensemble des jeux de données utilisés.  
+  - **script/** regroupe les scripts R nécessaires aux analyses et aux transformations.  
+  - **vis/** stocke les visualisations (figures, graphiques).  
+  - **cm/** rassemble les comptes rendus, notes ou documents complémentaires.  
+
+Le fichier **README.md** décrit la structure du projet et fournit les instructions d’utilisation.
