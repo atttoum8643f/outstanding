@@ -94,7 +94,7 @@ Dans ce mini-cours, nous allons aborder trois sujets essentiels pour la manipula
 
 \begin{itemize}
     \item Changer la modalité de référence dans un modèle ANOVA afin de mieux interpréter les coefficients.
-    \item Remplacer les valeurs manquantes par la médiane, une méthode simple et efficace d’imputation.
+    \item Remplacer les valeurs manquantes par la moyenne, une méthode simple et efficace d’imputation.
     \item Représenter les contributions individuelles des observations dans un modèle linéaire (\texttt{lm}), l’équivalent des effets aléatoires (\texttt{ranef}) utilisés dans les modèles mixtes (\texttt{lmer}).
 \end{itemize}
 
@@ -113,7 +113,7 @@ library(lattice)
 
 Ci-dessous, nous importons les données **Exp2_height.csv** puis réalisons plusieurs étapes de nettoyage indispensables.
 
-Nous transformons d’abord les cellules vides en valeurs manquantes (**NA**), puis nous remplaçons les virgules par des points pour permettre la conversion correcte en format numérique 
+Nous transformons d’abord les cellules vides en valeurs manquantes (**NA**), puis nous remplaçons les virgules par des points pour permettre la conversion correcte en format numérique. 
 
 ```{r}
 # importation de données
@@ -138,75 +138,56 @@ data <- data.frame(lapply(data, function(col) {
 
 ## \textcolor{blue}{2.1. Imputation de données manquantes}
 
-Dans cette section, nous procédons à l’imputation des valeurs manquantes pour les variables de hauteur. 
-Nous commençons par convertir les colonnes concernées au format numérique, puis nous remplaçons chaque valeur manquante par la moyenne correspondante de la colonne. 
-Dans cette implémentation, les données sont **centrées autour de leur moyenne** avant l'imputation. 
+Dans cette section, nous procédons à l’imputation des valeurs manquantes pour les variables de hauteur.
+Nous commençons par convertir les colonnes concernées au format numérique, puis nous remplaçons chaque valeur manquante par la moyenne de la variable correspondante.
 
-La fonction **imput** présentée en annexe permet de réaliser une **imputation itérative des valeurs manquantes** dans un jeu de données. 
-Elle fonctionne en ajustant successivement un modèle linéaire pour chaque variable contenant des NA, en utilisant les autres variables comme prédicteurs. 
+Dans notre jeu de données, les valeurs sont globalement centrées autour de leur moyenne (**imput_moy**), ce qui rend l’imputation par la moyenne particulièrement adaptée.
 
-Cette approche est particulièrement **robuste pour des données dont les variables présentent des relations linéaires**, et elle remplace les valeurs manquantes par les valeurs prédites de manière répétée sur plusieurs itérations afin d’améliorer la cohérence globale des données.
+\vspace{0.2cm}
 
-```{r, include=FALSE, echo=FALSE}
-imput <- function(X, iter = 4){
-  p <- ncol(X)
-  X_inter <- X
-  
-  for (k in 1:iter) {
-    cat("\n=== Itération", k, "===\n")
-    
-    for (j in 1:p) {
-      Y <- X_inter[, j]
-      na_rows <- which(is.na(Y))
-      
-      if (length(na_rows) > 0) {
-        Y <- X[, j]
-        # Construire le data.frame des prédicteurs
-        exp <- X[, -j, drop = FALSE]
-        
-        # Si j = 1, remplacer les NA des prédicteurs par leur moyenne
-        if (j == 1) {
-          for (col in 1:ncol(exp)) {
-            na_pred <- is.na(exp[, col])
-            if (any(na_pred)) {
-              exp[na_pred, col] <- mean(exp[, col], na.rm = TRUE)
-            }
-          }
-        }
-        
-        df <- data.frame(Y = Y, exp)
-        
-        # Modèle linéaire
-        mod <- lm(Y ~ ., data = df)
-        
-        # Valeurs prédites pour les NA
-        pred_na <- mod$fitted.values[na_rows]
-        
-        # Affichage des valeurs imputées
-        cat("variable", j, "- indices NA:", na_rows, "\n")
-        cat("Valeurs prédites:", round(pred_na, 4), "\n\n")
-        
-        # Remplacer les NA par les valeurs prédites
-        Y[na_rows] <- pred_na
-        X[, j] <- Y
-      }
-    }
-  }
-  
-  return(X)
-}
-```
-
-
-```{r}
+```{r, fig.align='center', fig.height=4.1, fig.width=5.4, fig.align='center'}
 # selectionner les variable
 hauteur <- c("height_1_var_1", "height_2_var_2")
 
 # séléctionner les variables sur la hauteur
 data[,hauteur] <- lapply(data[,hauteur], as.numeric)
 
+h1 <- data$height_1_var_1
+h2 <- data$height_2_var_2
+plot(h1, h2, 
+     main = "Representation de la varété 1 en fonction de la variété 2",
+     xlab = "h1", 
+     ylab = "h2",
+     pch = 19, 
+     col = "#462E01", 
+     cex.main = 0.85)
+
+```
+
+
+La fonction \texttt{imput} (présentée en annexe) propose également une imputation itérative basée sur des modèles linéaires utilisant les autres variables comme prédicteurs.
+Contrairement à l’imputation par la moyenne, cette approche est particulièrement **robuste pour des données dont les variables présentent des relations linéaires**, et elle remplace les valeurs manquantes par les valeurs prédites de manière répétée sur plusieurs itérations afin d’améliorer la cohérence globale des données.
+
+\vspace{0.2cm}
+
+```{r, include=FALSE, echo=FALSE}
+# Imputation par la moyenne
+imput_moy <- function(Xna){
+  Xna <- sapply(Xna, as.numeric)
+  for (col in 1:ncol(Xna)) {
+      na_rows <- which(is.na(Xna[,col]))
+      Xna[na_rows, col] <- mean(Xna[, col], na.rm = TRUE)
+            
+  }
+  return(round(Xna,2))
+}
+
+```
+
+
+```{r}
 # Utilisation
-data[,hauteur] <- imput(data[,hauteur])
+data[,hauteur] <- imput_moy(data[,hauteur])
 
 ```
 
@@ -260,6 +241,8 @@ $$
 
 Nous allons dans la suite voir comment effectuer à un changement de référence sous R.
 
+\vspace{0.2cm}
+
 ```{r, eval=FALSE}
 # s'assurer que var_1 est bien un facteur
 data$var_1 <- factor(data$var_1) 
@@ -283,6 +266,8 @@ dotplot(rr1)
 
 Dans cette section, nous allons créer un équivalent **dotplot_lm** des effets des interactions pour un modèle linéaire classique (lm). Nous visualiserons les coefficients par combinaison de variables à l'aide d'un dotplot avec intervalles de confiance. Pour plus de détaille sur la fonction **dotplot_lm** voir en annexe.
 
+\vspace{0.2cm}
+
 ```{r, include=FALSE, echo=FALSE}
 # equivalent de ranef
 dotplot_lm <- function(mod, nom_var_inter, col="blue"){
@@ -305,7 +290,7 @@ xlim_range <- range(c(ci_comb_ord[,1]-0.85, ci_comb_ord[,2], rrr_ord)+0.85)
 dotplot(rrr_ord,
         xlab = "Coefficient",
         ylab = "Combinaison",
-        main = "Effets par combinaison avec IC",
+        main = "Effets par combinaison",
         xlim = xlim_range,  # forcer l'axe x
         panel = function(x, y) {
           panel.dotplot(x, y)
@@ -317,10 +302,10 @@ dotplot(rrr_ord,
 }
 ```
 
-
+\vspace{0.2cm}
 
 ```{r, eval=FALSE}
-mod2 <- lm(data$height_1_var_1 ~ var_1 + comb, 
+mod2 <- lm(data$height_1_var_1 ~ var_1 + var_2 +  comb, 
             data = data)
 summary(mod2)
 
@@ -329,11 +314,11 @@ dotplot_lm(mod2, "comb")
 
 
 \newpage
+# \textcolor{red}{3. Annexe}
 
-# \textcolor{red}{Annexe}
 
 ```{r, eval=FALSE}
-# equivalent de ranef
+# equivalent de ranef pour lm
 dotplot_lm <- function(mod, nom_var_inter, col="blue"){
   # Extraire les coefficients des combinaisons
 rrr <- sort(coef(mod)[grep(nom_var_inter, names(coef(mod)))])
@@ -359,16 +344,18 @@ dotplot(rrr_ord,
         panel = function(x, y) {
           panel.dotplot(x, y)
           for(i in seq_along(x)) {
-            panel.segments(ci_comb_ord[i, 1], i, ci_comb_ord[i, 2], i, col = col, lwd = 2)
+            panel.segments(ci_comb_ord[i, 1], i, ci_comb_ord[i, 2], i, 
+                           col = col, lwd = 2)
           }
         })
 }
 
 ```
 
-
+\vspace{0.2cm}
 
 ```{r, eval=FALSE}
+# Imputation à l'aide d'une régression linéaire
 imput <- function(X, iter = 4){
   p <- ncol(X)
   X_inter <- X
@@ -416,13 +403,31 @@ imput <- function(X, iter = 4){
   
   return(X)
 }
+```
+
+\vspace{0.2cm}
+
+```{r, eval=FALSE}
+# Imputation par la moyenne
+imput_moy <- function(Xna){
+  for (col in 1:ncol(Xna)) {
+      na_pred <- is.na(Xna[, col])
+      if (any(na_pred)){
+      Xna[na_pred, col] <- mean(Xna[, col], na.rm = TRUE)
+            }
+      }
+}
+
 
 ```
+
+\vspace{0.2cm}
 
 Pour la variable **h2** du code ci-dessous, une transformation a été appliquée pour corriger son asymétrie : inversion autour de sa valeur maximale, suivie d’une racine carrée.  
 Cette approche permet de rendre la distribution plus symétrique et plus proche d’une distribution normale.  
 Les histogrammes avant et après transformation montrent clairement l’amélioration de la forme de **h2**.
 
+\vspace{0.2cm}
 
 ```{r, fig.height=3.7, fig.width=4.9, fig.align='center'}
 h1 <- data$height_1_var_1
@@ -464,3 +469,16 @@ hist(h2_t, breaks = 15, freq = FALSE,
 lines(x2_t, d2_t, col="red", lwd = 2)
 
 ```
+
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem{wikistat}
+Wikistat. \textit{Modèles Mixtes et ANOVA}.  
+Disponible à l’adresse : \url{https://wikistat.fr/pdf/st-m-modmixt3-anova.pdf}
+
+\bibitem{github}
+Attoum. \textit{Outstanding}.  
+Disponible à l’adresse : \url{https://github.com/atttoum8643f/outstanding/blob/main}
+
+\end{thebibliography}
